@@ -1,4 +1,4 @@
-# GRE Daily
+# GRE Daily(Chinese version中文版)
 
 A single-page GRE vocabulary review site designed for GitHub Pages.
 
