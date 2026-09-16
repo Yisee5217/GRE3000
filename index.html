@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GRE Daily</title>
+<style>
+:root{
+  --bg:#f7f5ef;
+  --panel:#ffffff;
+  --ink:#1c2533;
+  --muted:#7d8795;
+  --line:#e8e4da;
+  --accent:#2f6f68;
+  --accent-soft:#e6f1ee;
+  --danger:#b95353;
+  --shadow:0 18px 50px rgba(31,38,48,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+button,select{font:inherit}
+button{cursor:pointer}
+.app{width:min(100%,680px);min-height:100vh;margin:auto;padding:0 18px 36px}
+.topbar{height:78px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+.logo{width:40px;height:40px;border-radius:14px;background:var(--ink);color:#fff;display:grid;place-items:center;
+  font-weight:900;font-size:20px;box-shadow:0 8px 18px rgba(28,37,51,.18)}
+.brand-text b{display:block;font-size:15px;letter-spacing:.2px}
+.brand-text span{display:block;margin-top:2px;font-size:11px;color:var(--muted)}
+.icon{border:0;background:transparent;color:var(--ink);font-size:20px;padding:8px}
+.page{display:none}.page.active{display:block}
+.hero{padding:24px 6px 14px}.compact-hero{padding-bottom:10px}
+.eyebrow{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.hero h1{margin:10px 0 8px;font-size:40px;letter-spacing:-1.3px;line-height:1.08}
+.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.7}
+.task-card{background:var(--panel);border:1px solid var(--line);border-radius:28px;padding:24px;box-shadow:var(--shadow)}
+.card-top{display:flex;justify-content:space-between;align-items:center}
+.card-title{font-size:14px;font-weight:800}
+.badge{font-size:11px;font-weight:800;padding:7px 10px;border-radius:999px;background:#f1f2f3;color:#6b7280}
+.big-number{font-size:82px;line-height:1;font-weight:900;letter-spacing:-4px;margin:26px 0 18px}
+.big-sub{font-size:12px;color:var(--muted);margin-bottom:22px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);padding-top:17px}
+.metric{padding:0 14px;border-right:1px solid var(--line)}
+.metric:first-child{padding-left:0}.metric:last-child{border-right:0}
+.metric b{display:block;font-size:22px}.metric span{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.primary{width:100%;border:0;background:var(--ink);color:#fff;border-radius:16px;padding:16px 18px;font-weight:850;font-size:15px;margin-top:22px;box-shadow:0 8px 22px rgba(28,37,51,.16)}
+.primary:disabled{opacity:.45;cursor:default}
+.secondary{width:100%;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:15px;padding:14px 16px;font-weight:750}
+.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.mini{background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:18px;padding:14px}
+.mini span{font-size:11px;color:var(--muted)}.mini b{display:block;font-size:23px;margin-top:3px}
+.learn-head{display:flex;align-items:center;gap:12px;margin:8px 0 18px}
+.back{border:0;background:transparent;font-size:24px;color:var(--ink);padding:4px}
+.progress-wrap{flex:1}
+.progress-line{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:7px}
+.progress{height:7px;background:#e4e5e7;border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:.25s}
+.word-card{position:relative;min-height:510px;background:var(--panel);border:1px solid var(--line);border-radius:30px;
+  padding:28px 26px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:var(--shadow)}
+.word-unit{position:absolute;top:23px;left:25px;font-size:11px;color:var(--muted);font-weight:700}
+.trash{position:absolute;top:14px;right:16px;border:0;background:transparent;font-size:20px;opacity:.55;padding:10px}
+.word{font-size:52px;font-weight:900;letter-spacing:-1.3px;line-height:1.08;word-break:break-word;margin:20px 0 10px}
+.prompt{font-size:13px;color:var(--muted);min-height:0}
+.answer{display:none;width:100%;border-top:1px solid var(--line);margin-top:30px;padding-top:26px}
+.answer.show{display:block}
+.meaning{font-size:26px;line-height:1.45;font-weight:850}
+.note{margin-top:12px;font-size:13px;line-height:1.75;color:var(--muted)}
+.answer-state{display:inline-block;margin-top:18px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:7px 10px;font-size:11px;font-weight:800}
+.judges{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.judges button{border-radius:16px;padding:17px 12px;font-size:16px;font-weight:850}
+.unknown{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.known{background:var(--accent);border:1px solid var(--accent);color:#fff}
+.next{display:none}.next.show{display:block}
+.section-title{display:flex;align-items:center;gap:8px;margin:16px 0 18px}
+.section-title h2{margin:0;font-size:26px;letter-spacing:-.5px}
+.stats-top{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow);margin-bottom:12px}
+.stats-top div{text-align:center;border-right:1px solid var(--line)}.stats-top div:last-child{border-right:0}
+.stats-top span{font-size:11px;color:var(--muted);display:block}.stats-top b{font-size:26px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px;margin-bottom:12px}
+.panel h3{margin:0 0 12px;font-size:14px}
+.row{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:12px 0;font-size:13px}
+.row:first-of-type{border-top:0}
+.muted{font-size:13px;color:var(--muted);line-height:1.7}
+.trash-list{display:flex;flex-direction:column;gap:9px}
+.trash-item{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px 14px}
+.trash-item b{font-size:15px}.trash-item span{font-size:11px;color:var(--muted);display:block;margin-top:2px}
+.restore{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800}
+.setting{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.setting b{display:block;font-size:14px}.setting span{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+select{border:1px solid var(--line);border-radius:12px;background:#fff;padding:9px 12px}
+.rule{font-size:12px;line-height:1.75;color:#56606e;margin:8px 0}
+.danger{width:100%;background:#fff;color:var(--danger);border:1px solid #ead0d0;border-radius:15px;padding:14px;font-weight:800}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,12px);background:var(--ink);color:#fff;padding:10px 14px;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:30}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:520px){
+  .app{padding:0 12px 28px}.topbar{height:66px}.hero{padding:24px 4px 18px}.hero h1{font-size:32px}
+  .task-card{padding:20px}.big-number{font-size:68px}.word-card{min-height:60vh;padding:24px 18px}.word{font-size:42px}.meaning{font-size:22px}
+  .metric{padding:0 9px}
+}
+
+.loading-screen{
+  position:fixed;inset:0;background:var(--bg);z-index:999;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+.loading-card{
+  width:min(100%,420px);background:var(--panel);border:1px solid var(--line);
+  border-radius:24px;padding:28px;box-shadow:var(--shadow);text-align:center;
+}
+.loading-spinner{
+  width:32px;height:32px;margin:0 auto 18px;border:3px solid #dfe4e2;
+  border-top-color:var(--accent);border-radius:50%;animation:spin .85s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-title{font-size:18px;font-weight:850;margin-bottom:8px}
+.loading-text{font-size:12px;line-height:1.65;color:var(--muted)}
+.integrity{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-top:1px solid var(--line);padding:12px 0;font-size:13px;
+}
+.integrity:first-of-type{border-top:0}
+.integrity small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.integrity-ok{color:var(--accent);font-weight:850}
+.sense-list{display:flex;flex-direction:column;gap:9px;align-items:stretch}
+.sense-item{
+  display:grid;grid-template-columns:26px 1fr;gap:8px;text-align:left;
+  font-size:21px;font-weight:800;line-height:1.45;
+}
+.sense-num{
+  width:24px;height:24px;border-radius:999px;background:var(--accent-soft);
+  color:var(--accent);display:grid;place-items:center;font-size:11px;font-weight:900;margin-top:3px;
+}
+.sense-single{font-size:24px;font-weight:850;line-height:1.45;text-align:center}
+.source-note{font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px;text-align:center}
+
+</style>
+</head>
+<body>
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-card">
+    <div class="loading-spinner" id="loadingSpinner"></div>
+    <div class="loading-title" id="loadingTitle">正在载入完整词库</div>
+    <div class="loading-text" id="loadingText">第一次打开会联网读取一次词库并保存到这台设备。以后学习进度和词库都保存在本机。</div>
+  </div>
+</div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand" onclick="go('home')">
+      <div class="logo">G</div>
+      <div class="brand-text"><b>GRE Daily</b></div>
+    </div>
+    <button class="icon" onclick="go('settings')" aria-label="设置">⚙</button>
+  </header>
+
+  <section class="page active" id="home">
+    <div class="hero compact-hero">
+      <div class="eyebrow" id="todayText"></div>
+    </div>
+
+    <div class="task-card">
+      <div class="card-top">
+        <div class="card-title">今日任务</div>
+        <div class="badge" id="todayStatus">未开始</div>
+      </div>
+      <div class="big-number" id="taskTotal">10</div>
+      
+      <div class="metrics">
+        <div class="metric"><b id="dueCount">0</b><span>到期复习</span></div>
+        <div class="metric"><b id="newCount">10</b><span>今日新词</span></div>
+        <div class="metric"><b id="weakCount">0</b><span>薄弱优先</span></div>
+      </div>
+      <div id="homeEstimate" style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center;"></div>
+      <button class="primary" id="startBtn">开始今日学习</button>
+    </div>
+
+    <div class="overview">
+      <div class="mini"><span>学习中</span><b id="learningTotal">0</b></div>
+      <div class="mini"><span>稳定掌握</span><b id="masteredTotal">0</b></div>
+      <div class="mini"><span>垃圾桶</span><b id="trashTotal">0</b></div>
+    </div>
+    <button class="secondary" onclick="go('stats')">查看学习进度</button>
+  </section>
+
+  <section class="page" id="learn">
+    <div class="learn-head">
+      <button class="back" onclick="go('home')">←</button>
+      <div class="progress-wrap">
+        <div class="progress-line"><span id="progressText">今日完成 0 / 10</span><span id="remainingText">剩 10</span></div>
+        <div class="progress"><i id="progressBar"></i></div>
+      </div>
+    </div>
+    <div class="word-card">
+      <div class="word-unit" id="wordUnit">完整词库 · 随机</div>
+      <button class="trash" id="trashBtn" title="完全会了">🗑</button>
+      <div class="word" id="wordText"></div>
+      <div class="prompt" id="promptText"></div>
+      <div class="answer" id="answerBox">
+        <div class="meaning" id="meaningText"></div>
+        <div class="note" id="noteText"></div>
+        <div class="answer-state" id="answerState"></div>
+      </div>
+    </div>
+    <div class="judges" id="judgeBox">
+      <button class="known" id="knownBtn">认识</button>
+      <button class="unknown" id="unknownBtn">不认识</button>
+    </div>
+    <button class="primary next" id="nextBtn">下一个</button>
+  </section>
+
+  <section class="page" id="stats">
+    <div class="section-title"><button class="back" onclick="go('home')">←</button><h2>学习进度</h2></div>
+    <div class="stats-top">
+      <div><span>累计判断</span><b id="statJudgements">0</b></div>
+      <div><span>认识</span><b id="statKnown">0</b></div>
+      <div><span>不认识</span><b id="statUnknown">0</b></div>
+    </div>
+    <div class="panel">
+      <h3>词库状态</h3>
+      <div class="row"><span>未学习</span><b id="statNew">0</b></div>
+      <div class="row"><span>学习中</span><b id="statLearning">0</b></div>
+      <div class="row"><span>稳定掌握</span><b id="statMastered">0</b></div>
+      <div class="row"><span>垃圾桶</span><b id="statTrash">0</b></div>
+    </div>
+    <div class="panel">
+      <h3>今日</h3>
+      <div class="row"><span>已完成</span><b id="statTodayDone">0</b></div>
+      <div class="row"><span>仍待完成</span><b id="statTodayLeft">0</b></div>
+    </div>
+    <button class="secondary" onclick="go('trash')">打开垃圾桶</button>
+  </section>
+
+  <section class="page" id="trash">
+    <div class="section-title"><button class="back" onclick="go('stats')">←</button><h2>垃圾桶</h2></div>
+    <p class="muted">放进这里的词不会再进入每日任务。误放后可以恢复。</p>
+    <div id="trashList" class="trash-list"></div>
+  </section>
+
+  <section class="page" id="settings">
+    <div class="section-title"><button class="back" onclick="go('home')">←</button><h2>设置</h2></div>
+    <div class="panel">
+      <div class="setting">
+        <div><b>每天新词</b><span>到期复习词不计入这个数量</span></div>
+        <input id="newPerDay" type="number" min="1" max="500" step="1" inputmode="numeric"
+          style="width:92px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px 12px;text-align:center;font-weight:800;" />
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);">
+        <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-end;">
+          <div>
+            <b style="display:block;font-size:14px;">预计完成首轮新词</b>
+            <span id="daysEstimateDetail" style="display:block;font-size:11px;color:var(--muted);margin-top:4px;"></span>
+          </div>
+          <div id="daysEstimate" style="font-size:28px;font-weight:900;white-space:nowrap;">-- 天</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>词库</h3>
+      <div class="integrity">
+        <div><b>完整性检查</b><small>词数、唯一性、中文释义均通过后才会开始学习</small></div>
+        <div class="integrity-ok" id="integrityText">检查中…</div>
+      </div>
+      <div class="integrity">
+        <div><b>学习顺序</b><small>新词池已随机打乱，不按原书 A→Z 顺序出现</small></div>
+        <div>随机</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>当前复习规则</h3>
+      <p class="rule">不认识 → 显示中文 → 隔 5–10 个词后自动回插。</p>
+      <p class="rule">新词当天连续认识 2 次，才算今天通过。</p>
+      <p class="rule">同一天连续错 3 次，不再死磕，第二天优先。</p>
+      <p class="rule">每天新词数量一旦修改，会从今天开始使用，并持续用于之后每天；以后再次修改，就从那一天起采用新的数量。</p>
+      <p class="rule">后续复习间隔由后台自动拉长，不向你显示具体日期。</p>
+    </div>
+    <button class="danger" id="resetBtn">清空全部学习记录</button>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+
+<script>
+(() => {
+  "use strict";
+
+  const EXPECTED_ROWS = 3041;
+  const EXPECTED_UNIQUE = 3036;
+  const VOCAB_CACHE_KEY = "gre-daily-full-vocab-v2";
+  const STATE_KEY = "gre-daily-full-state-v2";
+  const VOCAB_URLS = [
+    "https://raw.githubusercontent.com/Dramalf/GRE3000-cli/main/gre3000.json",
+    "https://cdn.jsdelivr.net/gh/Dramalf/GRE3000-cli@main/gre3000.json"
+  ];
+
+  let WORDS = [];
+  let byId = {};
+  let state = null;
+  let currentId = null;
+  let answered = false;
+
+  const $ = id => document.getElementById(id);
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  }
+
+  function splitSenses(meaning){
+    return String(meaning || "")
+      .split(/[；;]/)
+      .map(s => s.trim())
+      .filter(Boolean);
+  }
+
+  function normalizeVocab(payload){
+    if(!payload || !Array.isArray(payload.data) || payload.data.length < 2){
+      throw new Error("词库格式不正确");
+    }
+
+    const rows = payload.data.slice(1);
+    if(rows.length !== EXPECTED_ROWS){
+      throw new Error(`词库条目数异常：读取到 ${rows.length} 条，预期 ${EXPECTED_ROWS} 条`);
+    }
+
+    const blankWord = rows.filter(r => !String(r?.[0] ?? "").trim()).length;
+    const blankMeaning = rows.filter(r => !String(r?.[3] ?? "").trim()).length;
+    if(blankWord || blankMeaning){
+      throw new Error(`词库存在空内容：空单词 ${blankWord}，空释义 ${blankMeaning}`);
+    }
+
+    // 3041 个原始词条中有少量同拼写词条。
+    // 它们不是“遗漏”，而是同一 headword 的不同释义/考法。
+    // 对背词网站更合理的处理是合并为一个词，并保留所有不重复释义。
+    const merged = new Map();
+
+    rows.forEach((r, rowIndex) => {
+      const word = String(r?.[0] ?? "").trim();
+      const meaning = String(r?.[3] ?? "").trim();
+      const key = word.toLocaleLowerCase();
+      const senses = splitSenses(meaning);
+
+      if(!merged.has(key)){
+        merged.set(key, {
+          id: "w" + String(rowIndex + 1).padStart(4, "0"),
+          word,
+          meaning,
+          senses: [...senses],
+          sourceRows: [rowIndex + 1]
+        });
+      }else{
+        const item = merged.get(key);
+        item.sourceRows.push(rowIndex + 1);
+        for(const s of senses){
+          if(!item.senses.includes(s)) item.senses.push(s);
+        }
+        item.meaning = item.senses.join("；");
+      }
+    });
+
+    const words = [...merged.values()];
+    validateVocab(words, rows.length);
+    return { sourceCount: rows.length, words };
+  }
+
+  function validateVocab(words, sourceCount=EXPECTED_ROWS){
+    if(sourceCount !== EXPECTED_ROWS){
+      throw new Error(`词库条目数异常：${sourceCount}/${EXPECTED_ROWS}`);
+    }
+    if(words.length !== EXPECTED_UNIQUE){
+      throw new Error(`独立单词数异常：${words.length}/${EXPECTED_UNIQUE}`);
+    }
+    const noWord = words.filter(w => !w.word).length;
+    const noMeaning = words.filter(w => !w.meaning || !w.senses?.length).length;
+    if(noWord || noMeaning){
+      throw new Error(`词库存在空内容：空单词 ${noWord}，空释义 ${noMeaning}`);
+    }
+  }
+
+  function setLoading(title, text, spinning=true){
+    $("loadingTitle").textContent = title;
+    $("loadingText").textContent = text;
+    $("loadingSpinner").style.display = spinning ? "block" : "none";
+  }
+
+  async function fetchJson(url, timeoutMs=15000){
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try{
+      const res = await fetch(url, {cache:"no-store", mode:"cors", signal:controller.signal});
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function loadVocab(){
+    // 优先读取本机已经校验过的词库。
+    const cached = localStorage.getItem(VOCAB_CACHE_KEY);
+    if(cached){
+      try{
+        const parsed = JSON.parse(cached);
+        validateVocab(parsed.words, parsed.sourceCount);
+        return parsed.words;
+      }catch(e){
+        localStorage.removeItem(VOCAB_CACHE_KEY);
+      }
+    }
+
+    let lastErr = null;
+    for(const url of VOCAB_URLS){
+      try{
+        const payload = await fetchJson(url);
+        const normalized = normalizeVocab(payload);
+        localStorage.setItem(VOCAB_CACHE_KEY, JSON.stringify(normalized));
+        return normalized.words;
+      }catch(e){
+        lastErr = e;
+      }
+    }
+
+    throw new Error(
+      "第一次打开需要联网载入一次词库。请确认网络可用后重新打开。" +
+      (lastErr ? "（" + lastErr.message + "）" : "")
+    );
+  }
+
+  function todayKey(){
+    const d = new Date();
+    return [d.getFullYear(), String(d.getMonth()+1).padStart(2,"0"), String(d.getDate()).padStart(2,"0")].join("-");
+  }
+
+  function addDays(key, n){
+    const [y,m,d] = key.split("-").map(Number);
+    const x = new Date(y,m-1,d);
+    x.setDate(x.getDate()+n);
+    return [x.getFullYear(), String(x.getMonth()+1).padStart(2,"0"), String(x.getDate()).padStart(2,"0")].join("-");
+  }
+
+  function newSeed(){
+    if(globalThis.crypto?.getRandomValues){
+      const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] >>> 0;
+    }
+    return (Date.now() ^ Math.floor(Math.random()*0xffffffff)) >>> 0;
+  }
+
+  // Stable per-installation shuffle hash: random once, then order stays stable across reloads.
+  function hashWord(seed, str){
+    let h = (2166136261 ^ seed) >>> 0;
+    const s = String(str).toLocaleLowerCase();
+    for(let i=0;i<s.length;i++){
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    h ^= h >>> 16; h = Math.imul(h, 0x7feb352d) >>> 0;
+    h ^= h >>> 15; h = Math.imul(h, 0x846ca68b) >>> 0;
+    h ^= h >>> 16;
+    return h >>> 0;
+  }
+
+  function freshState(){
+    return {
+      settings:{newPerDay:10},
+      words:{},
+      stats:{judgements:0, known:0, unknown:0},
+      shuffleSeed:newSeed(),
+      day:null
+    };
+  }
+
+  function loadState(){
+    try{
+      state = JSON.parse(localStorage.getItem(STATE_KEY)) || freshState();
+    }catch(e){
+      state = freshState();
+    }
+    state.settings ||= {newPerDay:10};
+    state.words ||= {};
+    state.stats ||= {judgements:0,known:0,unknown:0};
+    state.shuffleSeed ??= newSeed();
+  }
+
+  function P(id){
+    return state.words[id] ||= {
+      status:"new", level:0, due:null, lastResult:null,
+      wrongTotal:0, correctTotal:0, trash:false, stubborn:false
+    };
+  }
+
+  function save(){
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  }
+
+  function toast(msg){
+    const t=$("toast"); t.textContent=msg; t.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t=setTimeout(()=>t.classList.remove("show"),1400);
+  }
+
+  function shuffledFreshCandidates(){
+    return WORDS
+      .filter(w => {
+        const p=P(w.id);
+        return !p.trash && p.status==="new";
+      })
+      .sort((a,b) => {
+        const ha=hashWord(state.shuffleSeed,a.word), hb=hashWord(state.shuffleSeed,b.word);
+        return ha===hb ? a.word.localeCompare(b.word) : ha-hb;
+      });
+  }
+
+  function ensureDay(){
+    const t=todayKey();
+    if(state.day && state.day.date===t) return;
+
+    const review = WORDS.filter(w=>{
+      const p=P(w.id);
+      return !p.trash && p.status!=="new" && p.due && p.due<=t;
+    }).sort((a,b)=>{
+      const pa=P(a.id), pb=P(b.id);
+      if(pa.stubborn!==pb.stubborn) return pa.stubborn ? -1 : 1;
+      const da=(pa.due||"").localeCompare(pb.due||"");
+      if(da!==0) return da;
+      return hashWord(state.shuffleSeed ^ 0x9e3779b9,a.word)-hashWord(state.shuffleSeed ^ 0x9e3779b9,b.word);
+    });
+
+    const weak = review.filter(w=>P(w.id).stubborn || P(w.id).lastResult==="unknown");
+    const weakIds = new Set(weak.map(w=>w.id));
+    const normal = review.filter(w=>!weakIds.has(w.id));
+    const fresh = shuffledFreshCandidates().slice(0, Number(state.settings.newPerDay||10));
+
+    const base=[];
+    [...weak,...normal,...fresh].forEach(w=>{ if(!base.includes(w.id)) base.push(w.id); });
+
+    state.day={
+      date:t, base:[...base], queue:[...base], completed:[],
+      index:0, learn:{}, started:false
+    };
+    save();
+  }
+
+  function DL(id){
+    ensureDay();
+    return state.day.learn[id] ||= {
+      correctStreak:0, wrongs:0, wasNew:P(id).status==="new"
+    };
+  }
+
+  function complete(id){
+    if(!state.day.completed.includes(id)) state.day.completed.push(id);
+  }
+
+  function scheduleLater(id, dist){
+    const at=Math.min(
+      state.day.queue.length,
+      state.day.index + Math.max(5,Math.min(10,dist))
+    );
+    state.day.queue.splice(at,0,id);
+  }
+
+  function nextId(){
+    ensureDay();
+    while(state.day.index < state.day.queue.length){
+      const id=state.day.queue[state.day.index];
+      if(P(id).trash || state.day.completed.includes(id)){
+        state.day.index++;
+        continue;
+      }
+      return id;
+    }
+    return null;
+  }
+
+  function advanceReview(id){
+    const p=P(id), intervals=[1,3,7,14,30,60,120];
+    p.level=Math.min((p.level||0)+1, intervals.length-1);
+    p.status=p.level>=5 ? "mastered" : "learning";
+    p.due=addDays(todayKey(), intervals[p.level]);
+    p.lastResult="known";
+    p.stubborn=false;
+  }
+
+  function rescueReview(id){
+    const p=P(id);
+    p.level=Math.max(0,(p.level||0)-1);
+    p.status="learning";
+    p.due=addDays(todayKey(),1);
+    p.lastResult="known";
+    p.stubborn=false;
+  }
+
+  function renderHome(){
+    ensureDay();
+    const d=new Date();
+    $("todayText").textContent=d.toLocaleDateString("zh-CN",{month:"long",day:"numeric",weekday:"long"});
+
+    const base=state.day.base.filter(id=>!P(id).trash);
+    const due=base.filter(id=>!DL(id).wasNew).length;
+    const fresh=base.filter(id=>DL(id).wasNew).length;
+    const weak=base.filter(id=>P(id).stubborn || P(id).lastResult==="unknown").length;
+    const left=base.filter(id=>!state.day.completed.includes(id)).length;
+
+    $("taskTotal").textContent=left;
+    $("dueCount").textContent=due;
+    $("newCount").textContent=fresh;
+    $("weakCount").textContent=weak;
+    $("todayStatus").textContent=left===0?"今日完成":state.day.started?"进行中":"未开始";
+    $("startBtn").textContent=left===0?"今天已经完成":state.day.started?"继续今日学习":"开始今日学习";
+    $("startBtn").disabled=left===0;
+
+    const ps=WORDS.map(w=>P(w.id));
+    $("learningTotal").textContent=ps.filter(p=>!p.trash&&p.status==="learning").length;
+    $("masteredTotal").textContent=ps.filter(p=>!p.trash&&p.status==="mastered").length;
+    $("trashTotal").textContent=ps.filter(p=>p.trash).length;
+    const est=getDaysEstimate();
+    $("homeEstimate").textContent=
+      est.unseen===0 ? "首轮新词已全部进入学习流程" :
+      `按每天 ${est.quota} 个新词，预计约 ${est.days} 天完成首轮`;
+  }
+
+  function renderProgress(){
+    const base=state.day.base.filter(id=>!P(id).trash);
+    const done=base.filter(id=>state.day.completed.includes(id)).length;
+    const left=base.length-done;
+    $("progressText").textContent=`今日完成 ${done} / ${base.length}`;
+    $("remainingText").textContent=`剩 ${left}`;
+    $("progressBar").style.width=(base.length?done/base.length*100:100)+"%";
+  }
+
+  function renderMeaning(w){
+    const senses=w.senses?.length ? w.senses : splitSenses(w.meaning);
+    if(senses.length<=1){
+      $("meaningText").innerHTML=`<div class="sense-single">${escapeHtml(senses[0]||w.meaning)}</div>`;
+      return;
+    }
+    $("meaningText").innerHTML =
+      '<div class="sense-list">' +
+      senses.map((s,i)=>`<div class="sense-item"><span class="sense-num">${i+1}</span><span>${escapeHtml(s)}</span></div>`).join("") +
+      '</div>';
+  }
+
+  function renderWord(){
+    const id=nextId();
+    if(!id){
+      save(); go("home"); toast("今日任务完成"); return;
+    }
+    currentId=id; answered=false;
+    const w=byId[id];
+
+    $("wordUnit").textContent=`完整词库 · ${WORDS.length}词 · 随机`;
+    $("wordText").textContent=w.word;
+    renderMeaning(w);
+    $("promptText").textContent="";
+    $("answerState").textContent="";
+    $("answerBox").classList.remove("show");
+    $("judgeBox").style.display="grid";
+    $("nextBtn").classList.remove("show");
+    renderProgress();
+  }
+
+  function answer(kind){
+    if(!currentId || answered) return;
+    answered=true;
+    const id=currentId, p=P(id), dl=DL(id);
+
+    state.stats.judgements++;
+    $("answerBox").classList.add("show");
+    $("judgeBox").style.display="none";
+    $("nextBtn").classList.add("show");
+
+    if(kind==="unknown"){
+      state.stats.unknown++;
+      dl.wrongs++;
+      dl.correctStreak=0;
+      p.wrongTotal++;
+      p.lastResult="unknown";
+      p.status="learning";
+      $("promptText").textContent="";
+
+      if(dl.wrongs>=3){
+        p.level=Math.max(0,(p.level||0)-1);
+        p.due=addDays(todayKey(),1);
+        p.stubborn=true;
+        complete(id);
+        $("answerState").textContent="今天连续错 3 次 · 明天优先";
+      }else{
+        scheduleLater(id,5+Math.floor(Math.random()*6));
+        $("answerState").textContent="已放回今日队列";
+      }
+    }else{
+      state.stats.known++;
+      dl.correctStreak++;
+      p.correctTotal++;
+      p.lastResult="known";
+      $("promptText").textContent="";
+
+      if(dl.wasNew){
+        p.status="learning";
+        if(dl.correctStreak>=2){
+          p.level=0;
+          p.due=addDays(todayKey(),1);
+          p.stubborn=false;
+          complete(id);
+          $("answerState").textContent="今天已通过";
+        }else{
+          scheduleLater(id,7+Math.floor(Math.random()*4));
+          $("answerState").textContent="今天还会再出现一次";
+        }
+      }else{
+        if(dl.wrongs>0){
+          rescueReview(id);
+          $("answerState").textContent="今天已纠正 · 间隔自动缩短";
+        }else{
+          advanceReview(id);
+          $("answerState").textContent="今天已通过";
+        }
+        complete(id);
+      }
+    }
+    save(); renderProgress();
+  }
+
+  function trashCurrent(){
+    if(!currentId) return;
+    const p=P(currentId);
+    p.trash=true;
+    p.status="trash";
+    p.due=null;
+    complete(currentId);
+    save();
+    state.day.index++;
+    toast("已放进垃圾桶");
+    renderWord();
+  }
+
+  function renderStats(){
+    ensureDay();
+    $("statJudgements").textContent=state.stats.judgements||0;
+    $("statKnown").textContent=state.stats.known||0;
+    $("statUnknown").textContent=state.stats.unknown||0;
+
+    const ps=WORDS.map(w=>P(w.id));
+    $("statNew").textContent=ps.filter(p=>!p.trash&&p.status==="new").length;
+    $("statLearning").textContent=ps.filter(p=>!p.trash&&p.status==="learning").length;
+    $("statMastered").textContent=ps.filter(p=>!p.trash&&p.status==="mastered").length;
+    $("statTrash").textContent=ps.filter(p=>p.trash).length;
+
+    const base=state.day.base.filter(id=>!P(id).trash);
+    const done=base.filter(id=>state.day.completed.includes(id)).length;
+    $("statTodayDone").textContent=done;
+    $("statTodayLeft").textContent=base.length-done;
+  }
+
+  function renderTrash(){
+    const box=$("trashList");
+    box.innerHTML="";
+    const items=WORDS.filter(w=>P(w.id).trash);
+
+    if(!items.length){
+      box.innerHTML='<div class="panel muted">垃圾桶还是空的。</div>';
+      return;
+    }
+
+    items.forEach(w=>{
+      const el=document.createElement("div");
+      el.className="trash-item";
+      el.innerHTML=`<div><b>${escapeHtml(w.word)}</b><span>${escapeHtml(w.meaning)}</span></div><button class="restore">恢复</button>`;
+      el.querySelector("button").onclick=()=>{
+        const p=P(w.id);
+        p.trash=false; p.status="learning"; p.level=0; p.due=todayKey(); p.stubborn=false;
+        if(!state.day.base.includes(w.id)){
+          state.day.base.unshift(w.id);
+          state.day.queue.unshift(w.id);
+        }
+        save(); renderTrash(); toast("已恢复");
+      };
+      box.appendChild(el);
+    });
+  }
+
+
+  function currentDayNewIds(){
+    ensureDay();
+    return state.day.base.filter(id => DL(id).wasNew && !P(id).trash);
+  }
+
+  function applyDailyQuotaNow(newQuota){
+    ensureDay();
+    newQuota = Math.max(1, Math.min(500, Number(newQuota) || 1));
+    state.settings.newPerDay = newQuota;
+
+    // Count new words already completed today. Those stay completed and are never undone.
+    const completedNew = state.day.base.filter(id =>
+      DL(id).wasNew && state.day.completed.includes(id) && !P(id).trash
+    );
+
+    // New words currently assigned today but not completed yet.
+    const pendingNew = state.day.base.filter(id =>
+      DL(id).wasNew && !state.day.completed.includes(id) && !P(id).trash
+    );
+
+    // Today's effective target cannot be lower than already-finished new words.
+    const targetToday = Math.max(completedNew.length, newQuota);
+    const keepPendingCount = Math.max(0, targetToday - completedNew.length);
+
+    // If quota was reduced, remove surplus not-yet-completed new words from today's base/queue.
+    const keepPending = new Set(pendingNew.slice(0, keepPendingCount));
+    const removePending = new Set(pendingNew.slice(keepPendingCount));
+
+    if(removePending.size){
+      state.day.base = state.day.base.filter(id => !removePending.has(id));
+      state.day.queue = state.day.queue.filter(id => !removePending.has(id));
+      // If current index moved past removed items, normalize to a valid range.
+      state.day.index = Math.min(state.day.index, state.day.queue.length);
+    }
+
+    // If quota was increased, add enough unseen words immediately to today's plan.
+    const currentlyAssignedNew = state.day.base.filter(id => DL(id).wasNew && !P(id).trash).length;
+    const need = Math.max(0, targetToday - currentlyAssignedNew);
+
+    if(need > 0){
+      const existing = new Set(state.day.base);
+      const candidates = shuffledFreshCandidates().filter(w => !existing.has(w.id)).slice(0, need);
+      for(const w of candidates){
+        // Mark as today's fresh word before status changes.
+        state.day.learn[w.id] = {correctStreak:0, wrongs:0, wasNew:true};
+        state.day.base.push(w.id);
+        state.day.queue.push(w.id);
+      }
+    }
+
+    save();
+  }
+
+  function getDaysEstimate(){
+    const quota = Math.max(1, Number(state.settings.newPerDay) || 1);
+    const unseen = WORDS.filter(w => {
+      const p = P(w.id);
+      return !p.trash && p.status === "new";
+    }).length;
+
+    // Words already allocated to today but still status=new are part of the unseen count,
+    // so ceil(unseen/quota) naturally includes today when there are fresh words left.
+    const days = unseen === 0 ? 0 : Math.ceil(unseen / quota);
+    return {quota, unseen, days};
+  }
+
+  function renderSettings(){
+    $("newPerDay").value=String(state.settings.newPerDay||10);
+    $("integrityText").textContent=`${WORDS.length}词 ✓（${EXPECTED_ROWS}词条）`;
+    const est=getDaysEstimate();
+    $("daysEstimate").textContent=est.days===0 ? "已完成" : `${est.days} 天`;
+    $("daysEstimateDetail").textContent=
+      est.unseen===0
+        ? "所有新词都已经进入过学习流程"
+        : `剩余 ${est.unseen} 个未学词 · 按每天 ${est.quota} 个新词估算`;
+  }
+
+  window.go=function(name){
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    $(name).classList.add("active");
+    if(name==="home") renderHome();
+    if(name==="learn") renderWord();
+    if(name==="stats") renderStats();
+    if(name==="trash") renderTrash();
+    if(name==="settings") renderSettings();
+    window.scrollTo(0,0);
+  };
+
+  function wireUI(){
+    $("startBtn").onclick=()=>{
+      ensureDay(); state.day.started=true; save(); go("learn");
+    };
+    $("knownBtn").onclick=()=>answer("known");
+    $("unknownBtn").onclick=()=>answer("unknown");
+    $("nextBtn").onclick=()=>{
+      state.day.index++; save(); renderWord();
+    };
+    $("trashBtn").onclick=trashCurrent;
+    $("newPerDay").onchange=()=>{
+      let n=Math.round(Number($("newPerDay").value));
+      if(!Number.isFinite(n) || n<1) n=1;
+      if(n>500) n=500;
+      $("newPerDay").value=String(n);
+      applyDailyQuotaNow(n);
+      renderSettings();
+      renderHome();
+      toast(`已改为每天 ${n} 个新词`);
+    };
+    $("resetBtn").onclick=()=>{
+      if(confirm("确认清空全部学习记录？")){
+        localStorage.removeItem(STATE_KEY);
+        location.reload();
+      }
+    };
+    document.addEventListener("keydown",e=>{
+      if(!$("learn").classList.contains("active")) return;
+      if(e.key==="1") $("knownBtn").click();
+      if(e.key==="2") $("unknownBtn").click();
+      if(e.key==="Enter" && $("nextBtn").classList.contains("show")) $("nextBtn").click();
+    });
+  }
+
+  async function init(){
+    try{
+      WORDS=await loadVocab();
+      byId=Object.fromEntries(WORDS.map(w=>[w.id,w]));
+      loadState();
+      WORDS.forEach(w=>P(w.id));
+      save();
+
+      $("loadingScreen").style.display="none";
+      wireUI();
+      ensureDay();
+      renderHome();
+    }catch(e){
+      console.error(e);
+      setLoading(
+        "完整词库载入失败",
+        e.message + " 请确认手机当前可以联网，然后重新打开这个文件。",
+        false
+      );
+    }
+  }
+
+  init();
+})();
+</script>
+
+</body>
+</html>
